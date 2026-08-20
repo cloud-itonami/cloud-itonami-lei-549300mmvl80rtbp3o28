@@ -1,0 +1,156 @@
+;; Verified public-register citations for the legal entity archived by this repository.
+;;
+;; Every row is checked live by tools/verify_citations.cljs:
+;;   * GET :cite/url must answer HTTP 2xx
+;;   * :cite/expect-substring must appear in the response body
+;;
+;; A URL that cannot be fetched, or whose body no longer carries the claim, is a
+;; DRIFT and fails the gate. Nothing is recorded here that was not retrieved.
+;;
+;; Three independent authorities are cited, not one: GLEIF (the global LEI
+;; system), the Belgian Crossroads Bank of Enterprises (the national trade
+;; register that validated the LEI), and Euronext (the exchange the shares
+;; are admitted to). The CBE rows are what make this more than a GLEIF mirror:
+;; the 1863 start date, the seat, and the legal form are corroborated by the
+;; register itself rather than by GLEIF's copy of it.
+;;
+;; Substrings are chosen from the RAW response body. Where a name carries
+;; non-ASCII characters the raw JSON escapes them (R85P's French name arrives
+;; as Soci\u00e9t\u00e9 anonyme), so the gate matches an ASCII name instead.
+;; The CBE page splits its address across HTML tags, so the seat is cited via
+;; the enterprise number and start date, which survive as contiguous text.
+;;
+;; Not cited: the entity's own legal page at www.solvay.com. It answered when
+;; this repository was created (2026-07-25) and now returns HTTP 403 to
+;; automated clients. That is bot protection, which this gate does not attempt
+;; to work around, so the page is left out rather than recorded as a citation
+;; the gate cannot check. 80-data/public/tos.journal.edn keeps the archived
+;; text and its retrieval date.
+;;
+;; Independent third-party archive. Not affiliated with, endorsed by, or
+;; sponsored by SOLVAY.
+
+{:catalog/subject
+ {:company/legal-name  "SOLVAY"
+  :company/lei         "549300MMVL80RTBP3O28"
+  :company/jurisdiction "BE"
+  :company/business-id "0403.091.220"
+  :company/legal-form-elf "R85P"
+  :company/website     "https://www.solvay.com/en/"}
+
+ :catalog/retrieved "2026-08-20T07:57:11Z"
+
+ :catalog/entries
+ [{:cite/id "gleif-lei-record"
+   :cite/authority :gleif
+   :cite/claim "GLEIF publishes LEI 549300MMVL80RTBP3O28 with legal name SOLVAY, jurisdiction BE, entity status ACTIVE, registration status ISSUED and corroboration level FULLY_CORROBORATED."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28"
+   :cite/expect-substring "SOLVAY"}
+
+  {:cite/id "gleif-registered-as-cbe-number"
+   :cite/authority :gleif
+   :cite/claim "The same GLEIF record carries trade-register id 0403.091.220, which is the Belgian enterprise number the LEI was validated against. This is the join key to the CBE rows below."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28"
+   :cite/expect-substring "0403.091.220"}
+
+  {:cite/id "gleif-lei-record-legal-address"
+   :cite/authority :gleif
+   :cite/claim "The registered legal and headquarters address is RUE DE RANSBEEK 310, 1120 BRUSSELS, region BE-BRU, country BE."
+   :cite/url "https://api.gleif.org/api/v1/lei-records?filter%5Blei%5D=549300MMVL80RTBP3O28"
+   :cite/expect-substring "RANSBEEK"}
+
+  {:cite/id "gleif-entity-legal-form-r85p"
+   :cite/authority :gleif
+   :cite/claim "The reported ELF code R85P resolves to the Belgian legal form Naamloze vennootschap (nl) / Societe anonyme (fr) / Aktiengesellschaft (de). The gate matches the Dutch name because the French one arrives Unicode-escaped."
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/R85P"
+   :cite/expect-substring "Naamloze vennootschap"}
+
+  {:cite/id "gleif-registration-authority-ra000025"
+   :cite/authority :gleif
+   :cite/claim "The registration authority recorded on the LEI, RA000025, is the Crossroad Bank of Enterprises, operated by the Belgian Federal Public Service Economy."
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000025"
+   :cite/expect-substring "Crossroad Bank of Enterprises"}
+
+  {:cite/id "gleif-registration-authority-public-endpoint"
+   :cite/authority :gleif
+   :cite/claim "GLEIF names kbopub.economie.fgov.be as that authority's public search service, which is the host the CBE citations below are retrieved from."
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000025"
+   :cite/expect-substring "kbopub.economie.fgov.be"}
+
+  {:cite/id "gleif-managing-lou-record"
+   :cite/authority :gleif
+   :cite/claim "The LEI is maintained by managing LOU 213800WAVVOPS85N2205, LONDON STOCK EXCHANGE LEI LIMITED, a GB entity."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/213800WAVVOPS85N2205"
+   :cite/expect-substring "LONDON STOCK EXCHANGE LEI LIMITED"}
+
+  {:cite/id "gleif-lei-issuer-accreditation"
+   :cite/authority :gleif
+   :cite/claim "That managing LOU is listed by GLEIF as an accredited LEI issuer, accredited 2017-11-06."
+   :cite/url "https://api.gleif.org/api/v1/lei-issuers/213800WAVVOPS85N2205"
+   :cite/expect-substring "London Stock Exchange LEI Limited"}
+
+  {:cite/id "gleif-lei-issuer-relationship"
+   :cite/authority :gleif
+   :cite/claim "The LEI record's own lei-issuer relationship resolves to the same issuer, so the issuer is reachable from the subject record without knowing the LOU id in advance."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28/lei-issuer"
+   :cite/expect-substring "London Stock Exchange LEI Limited"}
+
+  {:cite/id "gleif-direct-parent-reporting-exception"
+   :cite/authority :gleif
+   :cite/claim "SOLVAY reports no direct accounting consolidation parent, with reason NO_KNOWN_PERSON. It is a parent entity, not a subsidiary."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28/direct-parent-reporting-exception"
+   :cite/expect-substring "NO_KNOWN_PERSON"}
+
+  {:cite/id "gleif-ultimate-parent-reporting-exception"
+   :cite/authority :gleif
+   :cite/claim "The same exception is filed at the ultimate level, category ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT, confirming no entity consolidates SOLVAY above it."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28/ultimate-parent-reporting-exception"
+   :cite/expect-substring "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT"}
+
+  {:cite/id "gleif-direct-children"
+   :cite/authority :gleif
+   :cite/claim "GLEIF lists direct children of this LEI, among them SYENSQO (BE), the specialty-materials entity separated from SOLVAY."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28/direct-children"
+   :cite/expect-substring "SYENSQO"}
+
+  {:cite/id "gleif-isins"
+   :cite/authority :gleif
+   :cite/claim "GLEIF maps this LEI to its ISINs, including BE0003470755, the Belgian ordinary share line."
+   :cite/url "https://api.gleif.org/api/v1/lei-records/549300MMVL80RTBP3O28/isins"
+   :cite/expect-substring "BE0003470755"}
+
+  {:cite/id "cbe-enterprise-number"
+   :cite/authority :be-cbe
+   :cite/claim "The Belgian Crossroads Bank of Enterprises publishes enterprise number 0403.091.220 directly, independently of GLEIF's copy of it."
+   :cite/url "https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?lang=en&ondernemingsnummer=0403091220"
+   :cite/expect-substring "0403.091.220"}
+
+  {:cite/id "cbe-legal-name"
+   :cite/authority :be-cbe
+   :cite/claim "The register records the name SOLVAY against that enterprise number, corroborating the GLEIF legal name from the national source."
+   :cite/url "https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?lang=en&ondernemingsnummer=0403091220"
+   :cite/expect-substring "SOLVAY"}
+
+  {:cite/id "cbe-start-date-1863"
+   :cite/authority :be-cbe
+   :cite/claim "The register gives a start date of December 26, 1863, matching the entity creation date on the LEI record. This predates the LEI system by 150 years and is only checkable against the national register."
+   :cite/url "https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?lang=en&ondernemingsnummer=0403091220"
+   :cite/expect-substring "December 26, 1863"}
+
+  {:cite/id "cbe-legal-form"
+   :cite/authority :be-cbe
+   :cite/claim "The register describes the legal form in English as Public limited company, which is the same form GLEIF encodes as ELF R85P."
+   :cite/url "https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?lang=en&ondernemingsnummer=0403091220"
+   :cite/expect-substring "Public limited company"}
+
+  {:cite/id "euronext-isin-listing"
+   :cite/authority :euronext
+   :cite/claim "Euronext publishes a live product page for ISIN BE0003470755 on market XBRU, corroborating the ISIN that GLEIF maps to this LEI."
+   :cite/url "https://live.euronext.com/en/product/equities/BE0003470755-XBRU"
+   :cite/expect-substring "BE0003470755"}
+
+  {:cite/id "euronext-market-brussels"
+   :cite/authority :euronext
+   :cite/claim "That product page names Euronext Brussels as the listing venue, tying the Belgian-registered entity to the Belgian market."
+   :cite/url "https://live.euronext.com/en/product/equities/BE0003470755-XBRU"
+   :cite/expect-substring "Euronext Brussels"}]}
